@@ -127,7 +127,7 @@ class Checkpointing_Adjoint(torch.autograd.Function):
 
                 _grad_t, *_grad_intput_and_param = torch.autograd.grad(
                     y, (point,) + input + f_params,
-                    grad_output, allow_unused=True)
+                    grad_output, allow_unused=True, retain_graph=options['retain_graph'])
 
                 delete_local_computation_graph(  flatten( [y, error] + list(variables)) )
 
@@ -173,6 +173,7 @@ def odesolve_adjoint(func, y0, options = None):
     options.update({'print_neval': print_neval}) # bool, when print number of function evaluations, recommended to set as False\n
     options.update({'neval_max': neval_max}) # int, maximum number of evaluations when encountering stiff problems, typically set as 5e5\n
     options.update({'t_eval': [t0, t0 + (t1-t0)/10, ...  ,t1]}) # Must be None, only output the value at time t1\n
+	options.update({'retain_graph': bool})  # use True to enable calculating gradients before the 'odesolve_adjoint' call
 
     out = odesolve_adjoint(func, y0, options = options) # func is the ODE; y0 is the initial condition, could be either a tensor or a tuple of tensors
     """
